@@ -71,6 +71,7 @@ const load = (key, fallback) => {
     return v ? JSON.parse(v) : fallback;
   } catch { return fallback; }
 };
+
 const QUICK_ACTIONS = [
   { id: "calm", label: "Necesito calmarme", prompt: "Estoy muy ansioso ahora mismo y necesito calmarme." },
   { id: "think", label: "Estoy sobrepensando", prompt: "No puedo parar de darle vueltas a algo y está paralizando." },
@@ -236,6 +237,7 @@ function ReframeTool({ onClose }) {
     </div>
   );
 }
+
 function DailyCheckin({ onSave, existing }) {
   const def = {
     animo: 5, ansiedad: 5, energia: 5,
@@ -431,6 +433,7 @@ function ContextProfile({ ctx, onChange }) {
     </div>
   );
 }
+
 function CrisisOverlay({ onClose }) {
   return (
     <div style={styles.crisisOverlay}>
@@ -505,9 +508,14 @@ function ChatPanel({ ctx, dailyState }) {
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
           system: buildSystemPrompt(ctx, dailyState),
           messages: newMsgs.slice(-12).map(m => ({ role: m.role, content: m.content }))
@@ -603,6 +611,7 @@ function ChatPanel({ ctx, dailyState }) {
     </>
   );
 }
+
 const styles = {
   section: { padding: "20px 20px 20px" },
   sectionTitle: { fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 16 },
